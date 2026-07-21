@@ -34,40 +34,36 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 relative overflow-hidden font-sans selection:bg-rose-500/30">
-      
-      {/* Animated Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-rose-600/20 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-pulse" style={{ animationDuration: '8s' }}></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-rose-900/40 rounded-full mix-blend-screen filter blur-[150px] opacity-60 animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
-      <div className="absolute top-[20%] right-[20%] w-[300px] h-[300px] bg-zinc-800/50 rounded-full mix-blend-screen filter blur-[100px] opacity-40"></div>
-
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
-
-      <div className="w-full max-w-[360px] p-8 rounded-[2rem] z-10 text-zinc-100 mx-4 bg-zinc-900/60 backdrop-blur-2xl border border-zinc-800/50 shadow-[0_0_80px_rgba(244,63,94,0.1)] relative">
-        <div className="absolute inset-0 rounded-[2rem] border border-white/5 pointer-events-none" style={{ maskImage: 'linear-gradient(to bottom, white, transparent)' }}></div>
-        
+    <div 
+      className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden font-sans selection:bg-rose-500/30"
+      style={{
+        backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('/meme_loopy1.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="w-full max-w-[360px] p-8 rounded-[2rem] z-10 text-slate-800 mx-4 bg-white/40 backdrop-blur-lg border border-slate-200/50 shadow-2xl relative">
         <div className="text-center mb-8 relative">
-          <div className="w-16 h-16 bg-gradient-to-br from-rose-400 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-500/30 ring-1 ring-white/20">
+          <div className="w-16 h-16 bg-gradient-to-br from-rose-400 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-500/30 ring-1 ring-white/50">
             <GraduationCap size={32} className="text-white" />
           </div>
           <h2 className="text-3xl font-bold mb-2 tracking-tight">Hệ Thống Quản Trị</h2>
-          <p className="text-zinc-400 text-sm font-medium">Đăng nhập để tiếp tục vào không gian làm việc</p>
+          <p className="text-slate-600 text-sm font-medium">Đăng nhập để tiếp tục vào không gian làm việc</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6 relative">
           {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-sm font-medium text-center animate-in fade-in zoom-in-95 duration-300">
+            <div className="p-4 bg-red-100/80 backdrop-blur-md border border-red-200 text-red-600 rounded-2xl text-sm font-medium text-center animate-in fade-in zoom-in-95 duration-300">
               {error}
             </div>
           )}
           
           <div className="space-y-2">
-            <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Tên đăng nhập</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Tên đăng nhập</label>
             <input 
               type="text" 
-              className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-all font-medium"
+              className="w-full bg-white/60 border border-slate-200/50 rounded-2xl px-5 py-4 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-all font-medium"
               placeholder="Nhập username của bạn" 
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -76,11 +72,11 @@ const AdminLogin = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Mật khẩu</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Mật khẩu</label>
             <div className="relative">
               <input 
                 type={showPassword ? 'text' : 'password'}
-                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 pr-12 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-all font-medium"
+                className="w-full bg-white/60 border border-slate-200/50 rounded-2xl px-5 py-4 pr-12 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-all font-medium"
                 placeholder="••••••••" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -89,7 +85,7 @@ const AdminLogin = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -99,10 +95,10 @@ const AdminLogin = () => {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="w-full group bg-zinc-100 hover:bg-white text-zinc-900 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none mt-4"
+            className="w-full group bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-rose-500/25 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:hover:translate-y-0 mt-4"
           >
             {isLoading ? (
-              <Loader2 size={20} className="animate-spin text-zinc-600" />
+              <Loader2 size={20} className="animate-spin text-white" />
             ) : (
               <>
                 Đăng nhập <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

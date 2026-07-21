@@ -28,7 +28,15 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans relative overflow-hidden">
+    <div 
+      className="flex h-screen font-sans relative overflow-hidden bg-slate-50"
+      style={{
+        backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url('/loopy-meme.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
@@ -38,15 +46,15 @@ const AdminLayout = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed md:static inset-y-0 left-0 w-72 bg-zinc-950 text-zinc-400 flex flex-col shadow-2xl z-40 border-r border-zinc-800/50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <aside className={`fixed md:static inset-y-0 left-0 w-72 bg-white/40 backdrop-blur-lg text-slate-800 flex flex-col shadow-2xl z-40 border-r border-slate-200/50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         {/* Mobile close button */}
         <button 
           onClick={() => setIsMobileMenuOpen(false)}
-          className="md:hidden absolute top-6 right-4 text-zinc-400 hover:text-white"
+          className="md:hidden absolute top-6 right-4 text-slate-500 hover:text-slate-800"
         >
           <CloseIcon size={24} />
         </button>
-        <div className="p-6 border-b border-zinc-800/80 flex items-center gap-4 relative overflow-hidden">
+        <div className="p-6 border-b border-slate-200/50 flex items-center gap-4 relative overflow-hidden">
           {/* Subtle background glow for logo area */}
           <div className="absolute -top-4 -left-4 w-24 h-24 bg-rose-500/20 blur-2xl rounded-full"></div>
           
@@ -54,8 +62,8 @@ const AdminLayout = () => {
             <GraduationCap size={24} />
           </div>
           <div className="relative z-10">
-            <h2 className="font-bold text-lg text-white leading-tight tracking-tight">Cún Meo ADMIN</h2>
-            <p className="text-[11px] font-semibold tracking-wider text-zinc-500 uppercase mt-0.5">Hệ thống quản trị</p>
+            <h2 className="font-bold text-lg text-slate-800 leading-tight tracking-tight">Cún Meo ADMIN</h2>
+            <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase mt-0.5">Hệ thống quản trị</p>
           </div>
         </div>
 
@@ -68,24 +76,24 @@ const AdminLayout = () => {
                 `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
                   isActive 
                     ? 'bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/25 font-semibold translate-x-1' 
-                    : 'hover:bg-zinc-900 hover:text-zinc-100 hover:translate-x-1'
+                    : 'hover:bg-white/50 hover:text-rose-600 hover:translate-x-1'
                 }`
               }
             >
-              <div className={({ isActive }) => `${isActive ? 'text-white' : 'text-zinc-500 group-hover:text-rose-400'} transition-colors`}>
+              <div className={({ isActive }) => `${isActive ? 'text-white' : 'text-slate-500 group-hover:text-rose-600'} transition-colors`}>
                 {item.icon}
               </div>
-              <span>{item.label}</span>
+              <span className="font-medium">{item.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-zinc-800/80 mb-2">
+        <div className="p-4 border-t border-slate-200/50 mb-2">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3.5 w-full rounded-2xl text-zinc-400 hover:bg-zinc-900 hover:text-rose-400 transition-colors font-medium group"
+            className="flex items-center gap-3 px-4 py-3.5 w-full rounded-2xl text-slate-600 hover:bg-white/50 hover:text-rose-600 transition-colors font-medium group"
           >
-            <LogOut size={20} className="text-zinc-500 group-hover:text-rose-400 transition-colors" />
+            <LogOut size={20} className="text-slate-500 group-hover:text-rose-600 transition-colors" />
             <span>Đăng xuất</span>
           </button>
         </div>
@@ -94,7 +102,7 @@ const AdminLayout = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto relative w-full md:w-[calc(100%-18rem)]">
         {/* Mobile Header */}
-        <div className="md:hidden bg-white px-4 py-3 flex items-center justify-between border-b border-slate-200 shadow-sm sticky top-0 z-20">
+        <div className="md:hidden bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-200/50 shadow-sm sticky top-0 z-20">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-rose-400 to-rose-600 rounded-lg flex items-center justify-center text-white shadow-md">
               <GraduationCap size={16} />

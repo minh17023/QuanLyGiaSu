@@ -79,7 +79,7 @@ const AdminAttendances = () => {
       
       {/* Sidebar chọn Lịch */}
       <div className="w-full md:w-1/3 flex flex-col gap-6">
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+        <div className="bg-white/40 backdrop-blur-lg p-6 rounded-3xl shadow-sm border border-slate-200">
           <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
             <Calendar className="text-blue-600" size={24} /> Chọn Ngày Điểm Danh
           </h2>
@@ -92,7 +92,7 @@ const AdminAttendances = () => {
           />
         </div>
 
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex-1">
+        <div className="bg-white/40 backdrop-blur-lg p-6 rounded-3xl shadow-sm border border-slate-200 flex-1">
           <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
             <Clock className="text-indigo-600" size={24} /> Các Ca Học Hôm Nay
           </h2>
@@ -124,7 +124,7 @@ const AdminAttendances = () => {
       </div>
 
       {/* Vùng Điểm Danh */}
-      <div className="w-full md:w-2/3 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+      <div className="w-full md:w-2/3 bg-white/40 backdrop-blur-lg p-8 rounded-3xl shadow-sm border border-slate-200">
         <div className="border-b border-slate-100 pb-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">

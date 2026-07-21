@@ -165,7 +165,7 @@ const AdminSchedules = () => {
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col animate-in fade-in duration-500 pb-10">
-      <div className="flex justify-between items-center mb-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className="flex justify-between items-center mb-6 bg-white/40 backdrop-blur-lg p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <CalendarIcon className="text-blue-600" size={32} /> Lịch giảng dạy
@@ -180,7 +180,7 @@ const AdminSchedules = () => {
         </button>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" style={{ height: 'calc(100vh - 200px)', minHeight: '820px' }}>
+      <div className="bg-white/40 backdrop-blur-lg p-6 rounded-2xl shadow-sm border border-slate-200" style={{ height: 'calc(100vh - 200px)', minHeight: '820px' }}>
         <Calendar
           localizer={localizer}
           events={events}

@@ -175,7 +175,7 @@ const AdminClasses = () => {
 
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white/40 backdrop-blur-lg p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <School className="text-blue-600" size={32} /> Quản lý Lớp học
@@ -190,7 +190,7 @@ const AdminClasses = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
+      <div className="bg-white/40 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">

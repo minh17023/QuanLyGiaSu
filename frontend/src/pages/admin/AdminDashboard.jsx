@@ -85,7 +85,7 @@ const AdminDashboard = () => {
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
       
       {/* SECTION BÁO CÁO THU NHẬP THEO THÁNG */}
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-6">
+      <div className="bg-white/40 backdrop-blur-lg p-6 rounded-3xl shadow-sm border border-slate-200/50 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-1"><Wallet className="text-emerald-600" size={24} /></div>
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                 <input type="file" accept=".json" onChange={handleImport} className="hidden" />
               </label>
             </div>
-            <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 mt-2 sm:mt-0">
+            <div className="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-xl border border-slate-200/50 mt-2 sm:mt-0">
               <label className="text-sm font-semibold text-slate-700">Chọn Tháng:</label>
               <input 
                 type="month" 
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Card 0: Tổng học sinh */}
-          <div className="p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between bg-white">
+          <div className="p-6 rounded-2xl border border-slate-200/50 shadow-sm flex items-center justify-between bg-white/40 backdrop-blur-lg">
             <div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Tổng Học Sinh</p>
               <p className="text-2xl font-black text-indigo-600">{finances.length}</p>
@@ -132,7 +132,7 @@ const AdminDashboard = () => {
             </div>
           </div>
           {/* Card 1: Tổng thu nhập */}
-          <div className="p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between bg-white">
+          <div className="p-6 rounded-2xl border border-slate-200/50 shadow-sm flex items-center justify-between bg-white/40 backdrop-blur-lg">
             <div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Tổng Thu Nhập Tạo Ra</p>
               <p className="text-2xl font-black text-emerald-600">{formatCurrency(summary.totalDebt)}</p>
@@ -144,7 +144,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Card 2: Đã thu tiền */}
-          <div className="p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between bg-white">
+          <div className="p-6 rounded-2xl border border-slate-200/50 shadow-sm flex items-center justify-between bg-white/40 backdrop-blur-lg">
             <div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Đã Thu Tiền (Trong tháng)</p>
               <p className="text-2xl font-black text-blue-600">{formatCurrency(summary.totalPaid)}</p>
@@ -156,7 +156,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Card 3: Còn nợ */}
-          <div className="p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between bg-white">
+          <div className="p-6 rounded-2xl border border-slate-200/50 shadow-sm flex items-center justify-between bg-white/40 backdrop-blur-lg">
             <div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Còn Nợ (Tháng chọn)</p>
               <p className="text-2xl font-black text-orange-500">{formatCurrency(summary.remainingDebt)}</p>
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-x-auto p-6">
+      <div className="bg-white/40 backdrop-blur-lg rounded-3xl shadow-sm border border-slate-200/50 overflow-x-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <h2 className="text-lg font-bold text-slate-800">Chi Tiết Thu Nhập Từng Học Sinh Trong Tháng</h2>
           {selectedMonth && (
@@ -193,9 +193,9 @@ const AdminDashboard = () => {
           </thead>
           <tbody>
             {finances.length === 0 ? (
-              <tr><td colSpan="7" className="text-center py-10 text-slate-500">Chưa có dữ liệu thu nhập trong tháng này</td></tr>
+              <tr><td colSpan="7" className="text-center py-10 text-slate-600 font-medium">Chưa có dữ liệu thu nhập trong tháng này</td></tr>
             ) : finances.map(student => (
-              <tr key={student.student_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+              <tr key={student.student_id} className="border-b border-slate-200/50 last:border-0 hover:bg-white/50 transition-colors">
                 <td className="py-4 px-2">
                   <p className="font-bold text-slate-800">{student.full_name}</p>
                 </td>

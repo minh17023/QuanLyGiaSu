@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Calendar, Users, LayoutDashboard, LogOut, ClipboardCheck, School } from 'lucide-react';
+import { BookOpen, Calendar, Users, LayoutDashboard, LogOut, ClipboardCheck, School, GraduationCap } from 'lucide-react';
 import { logout } from '../../services/auth.service';
 
 const AdminLayout = () => {
@@ -24,14 +24,17 @@ const AdminLayout = () => {
   return (
     <div className="flex h-screen bg-slate-50 font-sans">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20">
-        <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl text-white shadow-lg">
-            T
+      <aside className="w-72 bg-zinc-950 text-zinc-400 flex flex-col shadow-2xl z-20 border-r border-zinc-800/50">
+        <div className="p-6 border-b border-zinc-800/80 flex items-center gap-4 relative overflow-hidden">
+          {/* Subtle background glow for logo area */}
+          <div className="absolute -top-4 -left-4 w-24 h-24 bg-rose-500/20 blur-2xl rounded-full"></div>
+          
+          <div className="relative w-12 h-12 bg-gradient-to-br from-rose-400 to-rose-600 rounded-2xl flex items-center justify-center font-bold text-white shadow-lg shadow-rose-500/30 ring-1 ring-white/10">
+            <GraduationCap size={24} />
           </div>
-          <div>
-            <h2 className="font-bold text-lg text-white leading-tight">Tutor Admin</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Hệ thống quản lý</p>
+          <div className="relative z-10">
+            <h2 className="font-bold text-lg text-white leading-tight tracking-tight">Cún Meo ADMIN</h2>
+            <p className="text-[11px] font-semibold tracking-wider text-zinc-500 uppercase mt-0.5">Hệ thống quản trị</p>
           </div>
         </div>
 
@@ -41,26 +44,28 @@ const AdminLayout = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 ${
+                `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
                   isActive 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 font-semibold' 
-                    : 'hover:bg-slate-800 hover:text-white'
+                    ? 'bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/25 font-semibold translate-x-1' 
+                    : 'hover:bg-zinc-900 hover:text-zinc-100 hover:translate-x-1'
                 }`
               }
             >
-              {item.icon}
+              <div className={({ isActive }) => `${isActive ? 'text-white' : 'text-zinc-500 group-hover:text-rose-400'} transition-colors`}>
+                {item.icon}
+              </div>
               <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-zinc-800/80 mb-2">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3.5 w-full rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors font-medium"
+            className="flex items-center gap-3 px-4 py-3.5 w-full rounded-2xl text-zinc-400 hover:bg-zinc-900 hover:text-rose-400 transition-colors font-medium group"
           >
-            <LogOut size={20} />
-            <span>Đăng xuất</span>
+            <LogOut size={20} className="text-zinc-500 group-hover:text-rose-400 transition-colors" />
+            <span>Đăng xuất hệ thống</span>
           </button>
         </div>
       </aside>

@@ -174,7 +174,7 @@ const AdminClasses = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto animate-in fade-in duration-500">
+    <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
       <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">

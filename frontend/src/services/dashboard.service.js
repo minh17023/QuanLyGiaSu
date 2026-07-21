@@ -1,7 +1,12 @@
 import api from './api';
 
-export const getStudentFinances = async () => {
-  const response = await api.get('/dashboard/finances');
+export const getStudentFinances = async (month, year) => {
+  const params = {};
+  if (month && year) {
+    params.month = month;
+    params.year = year;
+  }
+  const response = await api.get('/dashboard/finances', { params });
   return response.data;
 };
 

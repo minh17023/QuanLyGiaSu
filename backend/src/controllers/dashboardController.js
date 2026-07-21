@@ -2,7 +2,8 @@ const dashboardService = require('../services/dashboardService');
 
 const getStudentFinances = async (req, res) => {
   try {
-    const finances = await dashboardService.getStudentFinances();
+    const { month, year } = req.query;
+    const finances = await dashboardService.getStudentFinances({ month, year });
     res.json(finances);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });

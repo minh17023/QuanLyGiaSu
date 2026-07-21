@@ -170,7 +170,7 @@ const AdminSchedules = () => {
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <CalendarIcon className="text-blue-600" size={32} /> Lịch giảng dạy
           </h1>
-          <p className="text-slate-500 mt-1 text-sm">Quản lý và xếp lịch theo Lớp hoặc Học sinh lẻ (Nhấp kéo thả trên lịch để thêm mới)</p>
+          <p className="text-slate-500 mt-1 text-sm">Quản lý và xếp lịch theo Lớp hoặc Học sinh lẻ </p>
         </div>
         <button 
           onClick={() => handleSelectSlot({ start: new Date(), end: new Date(new Date().setHours(new Date().getHours() + 1)) })} 
@@ -180,7 +180,7 @@ const AdminSchedules = () => {
         </button>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" style={{ height: '1000px' }}>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" style={{ height: 'calc(100vh - 200px)', minHeight: '820px' }}>
         <Calendar
           localizer={localizer}
           events={events}

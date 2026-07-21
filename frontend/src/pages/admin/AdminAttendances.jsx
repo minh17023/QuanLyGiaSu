@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getSchedulesByDate, getAttendanceForSchedule, markAttendance } from '../../services/attendance.service';
-import { ClipboardCheck, Calendar, Clock, Check, X, AlertCircle } from 'lucide-react';
+import { ClipboardCheck, Calendar, Clock, Check, X, AlertCircle, Search } from 'lucide-react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { vi } from 'date-fns/locale';
 import toast from 'react-hot-toast';
@@ -13,6 +13,7 @@ const AdminAttendances = () => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [attendanceList, setAttendanceList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -124,14 +125,28 @@ const AdminAttendances = () => {
 
       {/* Vùng Điểm Danh */}
       <div className="w-full md:w-2/3 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-        <div className="border-b border-slate-100 pb-6 mb-6">
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <ClipboardCheck className="text-blue-600" size={32} /> Danh Sách Điểm Danh
-          </h1>
-          {selectedSchedule && (
-            <p className="text-slate-500 mt-2 font-medium">
-              Lớp: <span className="text-slate-800">{selectedSchedule.Course?.name}</span> • Ca học: {formatTime(selectedSchedule.start_time)} - {formatTime(selectedSchedule.end_time)}
-            </p>
+        <div className="border-b border-slate-100 pb-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+              <ClipboardCheck className="text-blue-600" size={32} /> Danh Sách Điểm Danh
+            </h1>
+            {selectedSchedule && (
+              <p className="text-slate-500 mt-2 font-medium">
+                Lớp: <span className="text-slate-800">{selectedSchedule.Course?.name}</span> • Ca học: {formatTime(selectedSchedule.start_time)} - {formatTime(selectedSchedule.end_time)}
+              </p>
+            )}
+          </div>
+          {selectedSchedule && attendanceList.length > 0 && (
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input 
+                type="text"
+                placeholder="Tìm tên hoặc SĐT..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+              />
+            </div>
           )}
         </div>
 
@@ -143,7 +158,7 @@ const AdminAttendances = () => {
         ) : loading ? (
           <div className="text-center py-20 text-blue-500">Đang tải danh sách học sinh...</div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-slate-200">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
@@ -156,7 +171,10 @@ const AdminAttendances = () => {
                   <tr>
                     <td colSpan="2" className="py-12 text-center text-slate-500">Lớp học này chưa có học sinh nào đăng ký.</td>
                   </tr>
-                ) : attendanceList.map(item => (
+                ) : attendanceList.filter(item => {
+                  const term = searchTerm.toLowerCase();
+                  return item.full_name?.toLowerCase().includes(term) || item.phone?.includes(term);
+                }).map(item => (
                   <tr key={item.student_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
                     <td className="py-4 px-6">
                       <div className="font-bold text-slate-800 text-lg">{item.full_name}</div>

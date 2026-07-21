@@ -175,7 +175,7 @@ const AdminClasses = () => {
 
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
-      <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <School className="text-blue-600" size={32} /> Quản lý Lớp học
@@ -184,13 +184,13 @@ const AdminClasses = () => {
         </div>
         <button 
           onClick={openAddModal} 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-200 transition-colors"
+          className="w-full md:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-200 transition-colors whitespace-nowrap"
         >
           <Plus size={20} /> Tạo Lớp học
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">

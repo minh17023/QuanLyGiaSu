@@ -52,7 +52,7 @@ const AdminCourses = () => {
       name: course.name,
       description: course.description || '',
       price: course.price,
-      status: course.status
+      status: course.status || 'active'
     });
     setIsModalOpen(true);
   };
@@ -80,7 +80,7 @@ const AdminCourses = () => {
 
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
-      <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <BookOpen className="text-blue-600" size={32} /> Quản lý Khóa học / Môn học
@@ -89,13 +89,13 @@ const AdminCourses = () => {
         </div>
         <button 
           onClick={openAddModal} 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-200 transition-colors"
+          className="w-full md:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-200 transition-colors whitespace-nowrap"
         >
           <Plus size={20} /> Thêm Khóa học
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
@@ -121,9 +121,9 @@ const AdminCourses = () => {
                 </td>
                 <td className="py-4 px-6 text-center">
                   <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                    course.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'
+                    (course.status || 'active') === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'
                   }`}>
-                    {course.status === 'active' ? 'Hoạt động' : 'Đã đóng'}
+                    {(course.status || 'active') === 'active' ? 'Hoạt động' : 'Đã đóng'}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-center">

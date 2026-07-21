@@ -9,6 +9,7 @@ import ConfirmModal from '../../components/admin/ConfirmModal';
 
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -187,41 +188,73 @@ const AdminStudents = () => {
 
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
-      <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <Users className="text-blue-600" size={32} /> Quản lý Học sinh
           </h1>
           <p className="text-slate-500 mt-1 text-sm">Hồ sơ chi tiết, điểm danh, điểm kiểm tra và học phí</p>
         </div>
-        <button 
-          onClick={openAddStudentModal} 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-200 transition-colors"
-        >
-          <Plus size={20} /> Thêm Học sinh
-        </button>
+        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">
+          <input 
+            type="text"
+            placeholder="Tìm theo tên, SĐT, email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full md:w-64 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+          />
+          <button 
+            onClick={openAddStudentModal} 
+            className="w-full md:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg shadow-blue-200 transition-colors whitespace-nowrap"
+          >
+            <Plus size={20} /> Thêm Học sinh
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
               <th className="py-4 px-6 text-slate-600 font-semibold text-sm uppercase">Học sinh</th>
+              <th className="py-4 px-6 text-slate-600 font-semibold text-sm uppercase">Email</th>
               <th className="py-4 px-6 text-slate-600 font-semibold text-sm uppercase">SĐT Phụ huynh</th>
+              <th className="py-4 px-6 text-slate-600 font-semibold text-sm uppercase text-center">Điểm KT gần nhất</th>
               <th className="py-4 px-6 text-slate-600 font-semibold text-sm uppercase text-center">Hành động</th>
             </tr>
           </thead>
           <tbody>
-            {students.map(student => (
+            {students.filter(s => {
+              const term = searchTerm.toLowerCase();
+              return s.full_name?.toLowerCase().includes(term) || 
+                     s.username?.toLowerCase().includes(term) || 
+                     s.phone?.includes(term) || 
+                     s.email?.toLowerCase().includes(term);
+            }).map(student => {
+              const latestScore = student.TestScores && student.TestScores.length > 0 ? student.TestScores[0] : null;
+              return (
               <tr key={student.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                 <td className="py-4 px-6">
                   <p className="font-bold text-slate-800 text-lg">{student.full_name || 'Chưa cập nhật'}</p>
-                  <p className="text-sm text-slate-500 mt-1">{student.email || student.username}</p>
+                  <p className="text-sm text-slate-500 mt-1"> {student.username}</p>
+                </td>
+                <td className="py-4 px-6 text-slate-600 font-medium">
+                  {student.email || <span className="text-slate-400 italic">Chưa cập nhật</span>}
                 </td>
                 <td className="py-4 px-6">
                   <span className="font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full text-sm">
                     {student.phone || 'Chưa cập nhật'}
                   </span>
+                </td>
+                <td className="py-4 px-6 text-center">
+                  {latestScore ? (
+                    <div>
+                      <p className="font-bold text-orange-600 text-lg">{latestScore.score}</p>
+                      <p className="text-xs text-slate-500">{latestScore.test_type} ({new Date(latestScore.date).toLocaleDateString('vi-VN')})</p>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-slate-400">-</span>
+                  )}
                 </td>
                 <td className="py-4 px-6 text-center">
                   <div className="flex items-center justify-center gap-2">
@@ -234,7 +267,7 @@ const AdminStudents = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
       </div>
@@ -260,7 +293,7 @@ const AdminStudents = () => {
 
             {/* Tabs (Chỉ hiện khi đang xem chi tiết học sinh) */}
             {selectedStudent && (
-              <div className="flex border-b border-slate-200 px-6 mt-4 gap-6">
+              <div className="flex overflow-x-auto border-b border-slate-200 px-6 mt-4 gap-6 scrollbar-hide">
                 {[
                   { id: 'profile', icon: UserIcon, label: 'Hồ Sơ & Lớp Học' },
                   { id: 'attendance', icon: BookOpen, label: 'Nhật Ký & Điểm Danh' },
@@ -270,7 +303,7 @@ const AdminStudents = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 py-3 px-2 border-b-2 font-medium transition-colors ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                    className={`flex items-center gap-2 py-3 px-2 border-b-2 font-medium transition-colors whitespace-nowrap ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                   >
                     <tab.icon size={18} /> {tab.label}
                   </button>
@@ -361,7 +394,8 @@ const AdminStudents = () => {
                             <td className="py-4 px-4">
                               {a.status === 'present' ? <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">Có mặt</span> :
                                a.status === 'absent' ? <span className="text-red-600 font-bold bg-red-50 px-2 py-1 rounded">Vắng mặt</span> :
-                               <span className="text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded">Có phép</span>}
+                               a.status === 'excused' ? <span className="text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded">Có phép</span> :
+                               <span className="text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded">Chưa điểm danh</span>}
                             </td>
                           </tr>
                         ))
@@ -376,28 +410,28 @@ const AdminStudents = () => {
                 <div className="space-y-6">
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <h3 className="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2"><FileText size={20} className="text-orange-500"/> Nhập Điểm Kiểm Tra Mới</h3>
-                    <form onSubmit={handleAddTestScore} className="flex flex-wrap gap-4 items-end">
-                      <div className="flex-1 min-w-[150px]">
+                    <form onSubmit={handleAddTestScore} className="flex flex-col md:flex-row md:flex-wrap gap-4 md:items-end">
+                      <div className="w-full md:flex-1 md:min-w-[150px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Ngày thi</label>
                         <input type="date" required value={newScore.date} onChange={e => setNewScore({...newScore, date: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" />
                       </div>
-                      <div className="flex-[2] min-w-[200px]">
+                      <div className="w-full md:flex-[2] md:min-w-[200px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Loại bài (15p, Giữa kỳ...)</label>
                         <input type="text" required value={newScore.test_type} onChange={e => setNewScore({...newScore, test_type: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" placeholder="VD: Giữa kỳ IELTS" />
                       </div>
-                      <div className="flex-1 min-w-[100px]">
+                      <div className="w-full md:flex-1 md:min-w-[100px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Điểm số</label>
                         <input type="number" step="0.1" max="10" required value={newScore.score} onChange={e => setNewScore({...newScore, score: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" placeholder="0-10" />
                       </div>
-                      <div className="flex-[3] min-w-[300px]">
+                      <div className="w-full md:flex-[3] md:min-w-[300px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Nhận xét (Tùy chọn)</label>
                         <input type="text" value={newScore.notes} onChange={e => setNewScore({...newScore, notes: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" placeholder="Ghi chú chi tiết..." />
                       </div>
-                      <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold transition-colors">Lưu Điểm</button>
+                      <button type="submit" className="w-full md:w-auto bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold transition-colors">Lưu Điểm</button>
                     </form>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-slate-200 text-sm text-slate-500">
@@ -432,7 +466,7 @@ const AdminStudents = () => {
               {activeTab === 'payments' && (
                 <div className="space-y-6">
                   {/* Summary Bar */}
-                  <div className="flex gap-4">
+                  <div className="flex flex-col md:flex-row gap-4">
                     <div className="bg-white flex-1 p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center items-center">
                       <p className="text-slate-500 font-medium text-sm">Buổi "Có mặt"</p>
                       <p className="text-2xl font-bold text-slate-800">{attendances.filter(a => a.status === 'present').length} buổi</p>
@@ -454,24 +488,24 @@ const AdminStudents = () => {
 
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <h3 className="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2"><CreditCard size={20} className="text-emerald-600"/> Ghi Nhận Đợt Thanh Toán</h3>
-                    <form onSubmit={handleAddPayment} className="flex flex-wrap gap-4 items-end">
-                      <div className="flex-1 min-w-[150px]">
+                    <form onSubmit={handleAddPayment} className="flex flex-col md:flex-row md:flex-wrap gap-4 md:items-end">
+                      <div className="w-full md:flex-1 md:min-w-[150px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Ngày đóng tiền</label>
                         <input type="date" required value={newPayment.payment_date} onChange={e => setNewPayment({...newPayment, payment_date: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" />
                       </div>
-                      <div className="flex-[2] min-w-[200px]">
+                      <div className="w-full md:flex-[2] md:min-w-[200px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Số tiền đóng (VNĐ)</label>
                         <input type="number" required value={newPayment.amount} onChange={e => setNewPayment({...newPayment, amount: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" placeholder="VD: 500000" />
                       </div>
-                      <div className="flex-[3] min-w-[300px]">
+                      <div className="w-full md:flex-[3] md:min-w-[300px]">
                         <label className="text-sm font-semibold text-slate-700 block mb-1">Ghi chú (Tùy chọn)</label>
                         <input type="text" value={newPayment.note} onChange={e => setNewPayment({...newPayment, note: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" placeholder="VD: CK Vietcombank tháng 10" />
                       </div>
-                      <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold transition-colors">Lưu Giao Dịch</button>
+                      <button type="submit" className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold transition-colors">Lưu Giao Dịch</button>
                     </form>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-slate-200 text-sm text-slate-500">

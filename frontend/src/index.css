@@ -10,3 +10,50 @@
     @apply bg-slate-900/60 backdrop-blur-lg border border-white/10 shadow-2xl;
   }
 }
+
+/* Custom styles for react-big-calendar */
+.rbc-calendar {
+  font-family: inherit;
+}
+.rbc-btn-group button {
+  @apply text-slate-600 bg-white border-slate-200 shadow-sm transition-colors !important;
+}
+.rbc-btn-group button:hover {
+  @apply bg-slate-50 text-blue-600 !important;
+}
+.rbc-btn-group button.rbc-active {
+  @apply bg-blue-50 text-blue-700 border-blue-200 font-semibold shadow-inner !important;
+}
+.rbc-toolbar button:active, .rbc-toolbar button.rbc-active:hover, .rbc-toolbar button.rbc-active:focus {
+  @apply bg-blue-100 text-blue-800 !important;
+}
+.rbc-toolbar-label {
+  @apply font-bold text-lg text-slate-800 uppercase tracking-wide !important;
+}
+.rbc-header {
+  @apply py-3 font-semibold text-slate-600 border-slate-200 bg-slate-50/50 uppercase text-xs tracking-wider !important;
+}
+.rbc-month-view, .rbc-time-view, .rbc-agenda-view {
+  @apply border-slate-200 rounded-xl overflow-hidden shadow-sm !important;
+}
+.rbc-day-bg {
+  @apply border-slate-100 transition-colors !important;
+}
+.rbc-day-bg:hover {
+  @apply bg-slate-50/50 !important;
+}
+.rbc-today {
+  @apply bg-blue-50/30 !important;
+}
+.rbc-event {
+  @apply shadow-sm hover:shadow-md transition-shadow !important;
+}
+.rbc-time-header.rbc-overflowing {
+  @apply border-slate-200 !important;
+}
+.rbc-time-content {
+  @apply border-slate-200 !important;
+}
+.rbc-timeslot-group {
+  @apply border-slate-100 !important;
+}

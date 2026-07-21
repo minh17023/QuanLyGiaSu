@@ -1,11 +1,17 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Calendar, Users, LayoutDashboard, LogOut, ClipboardCheck, School, GraduationCap } from 'lucide-react';
+import { BookOpen, Calendar, Users, LayoutDashboard, LogOut, ClipboardCheck, School, GraduationCap, Menu, X as CloseIcon } from 'lucide-react';
 import { logout } from '../../services/auth.service';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+  // Close mobile menu when route changes
+  React.useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
   const handleLogout = () => {
     logout();
@@ -14,7 +20,7 @@ const AdminLayout = () => {
 
   const navItems = [
     { path: '/admin/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tổng quan' },
-    { path: '/admin/courses', icon: <BookOpen size={20} />, label: 'Môn học (Khóa)' },
+    { path: '/admin/courses', icon: <BookOpen size={20} />, label: 'Môn học' },
     { path: '/admin/classes', icon: <School size={20} />, label: 'Lớp học' },
     { path: '/admin/schedules', icon: <Calendar size={20} />, label: 'Lịch học' },
     { path: '/admin/attendances', icon: <ClipboardCheck size={20} />, label: 'Điểm danh' },
@@ -22,9 +28,24 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans">
+    <div className="flex h-screen bg-slate-50 font-sans relative overflow-hidden">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-72 bg-zinc-950 text-zinc-400 flex flex-col shadow-2xl z-20 border-r border-zinc-800/50">
+      <aside className={`fixed md:static inset-y-0 left-0 w-72 bg-zinc-950 text-zinc-400 flex flex-col shadow-2xl z-40 border-r border-zinc-800/50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        {/* Mobile close button */}
+        <button 
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="md:hidden absolute top-6 right-4 text-zinc-400 hover:text-white"
+        >
+          <CloseIcon size={24} />
+        </button>
         <div className="p-6 border-b border-zinc-800/80 flex items-center gap-4 relative overflow-hidden">
           {/* Subtle background glow for logo area */}
           <div className="absolute -top-4 -left-4 w-24 h-24 bg-rose-500/20 blur-2xl rounded-full"></div>
@@ -65,14 +86,27 @@ const AdminLayout = () => {
             className="flex items-center gap-3 px-4 py-3.5 w-full rounded-2xl text-zinc-400 hover:bg-zinc-900 hover:text-rose-400 transition-colors font-medium group"
           >
             <LogOut size={20} className="text-zinc-500 group-hover:text-rose-400 transition-colors" />
-            <span>Đăng xuất hệ thống</span>
+            <span>Đăng xuất</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto relative">
-        <div className="p-8">
+      <main className="flex-1 overflow-y-auto relative w-full md:w-[calc(100%-18rem)]">
+        {/* Mobile Header */}
+        <div className="md:hidden bg-white px-4 py-3 flex items-center justify-between border-b border-slate-200 shadow-sm sticky top-0 z-20">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-rose-400 to-rose-600 rounded-lg flex items-center justify-center text-white shadow-md">
+              <GraduationCap size={16} />
+            </div>
+            <h2 className="font-bold text-slate-800 tracking-tight">Cún Meo ADMIN</h2>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-slate-600 bg-slate-100 rounded-lg">
+            <Menu size={24} />
+          </button>
+        </div>
+
+        <div className="p-4 md:p-8 overflow-x-hidden">
           <Outlet />
         </div>
       </main>

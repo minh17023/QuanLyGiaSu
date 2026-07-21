@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, TestScore } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -54,7 +54,15 @@ const loginUser = async (username, password) => {
 const getStudents = async () => {
   return await User.findAll({
     where: { role: 'student' },
-    attributes: { exclude: ['password_hash'] }
+    attributes: { exclude: ['password_hash'] },
+    include: [{
+      model: TestScore,
+      attributes: ['score', 'date', 'test_type'],
+      order: [['date', 'DESC']]
+    }],
+    order: [
+      ['createdAt', 'DESC']
+    ]
   });
 };
 

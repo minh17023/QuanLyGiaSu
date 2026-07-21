@@ -40,12 +40,12 @@ const AdminDashboard = () => {
       
       {/* SECTION BÁO CÁO THU NHẬP THEO THÁNG */}
       <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-1"><Wallet className="text-emerald-600" size={24} /></div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800">Báo Cáo Thu Nhập Theo Tháng Gia Sư</h1>
-              <p className="text-slate-500 text-sm mt-1">Tự động tính toán dựa trên các buổi học điểm danh "Có mặt" thành công trong tháng chọn.</p>
+              <h1 className="text-xl font-bold text-slate-800">Báo Cáo Thu Nhập </h1>
+              <p className="text-slate-500 text-sm mt-1">Doanh thu theo tháng của gia sư</p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
@@ -109,8 +109,8 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-x-auto p-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <h2 className="text-lg font-bold text-slate-800">Chi Tiết Thu Nhập Từng Học Sinh Trong Tháng</h2>
           {selectedMonth && (
             <div className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full font-bold text-sm border border-emerald-100">

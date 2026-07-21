@@ -227,7 +227,7 @@ const AdminSchedules = () => {
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="radio" name="scheduleType" checked={scheduleType === 'individual'} onChange={() => setScheduleType('individual')} className="text-blue-600" />
-                      <span>Học sinh lẻ (Ghép nhóm)</span>
+                      <span>Học sinh lẻ</span>
                     </label>
                   </div>
                 </div>

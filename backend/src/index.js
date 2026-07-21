@@ -7,8 +7,8 @@ const app = express();
 
 // Middlewares
 app.use(cors());
-app.use(express.json()); // Phân tích JSON body
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' })); // Phân tích JSON body lớn (cho backup)
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Import Routes
 const userRoutes = require('./routes/userRoutes');
@@ -20,6 +20,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const testScoreRoutes = require('./routes/testScoreRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const backupRoutes = require('./routes/backupRoutes');
 
 // Basic route test
 app.get('/', (req, res) => {
@@ -36,6 +37,7 @@ app.use('/api/attendances', attendanceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/test-scores', testScoreRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/backup', backupRoutes);
 
 const PORT = process.env.PORT || 5000;
 

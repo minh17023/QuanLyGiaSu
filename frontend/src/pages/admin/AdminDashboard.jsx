@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getStudentFinances } from '../../services/dashboard.service';
-import { Wallet, DollarSign, Calendar as CalendarIcon, CheckCircle, Scale, Users } from 'lucide-react';
+import { exportDatabase, importDatabase } from '../../services/backup.service';
+import { Wallet, DollarSign, Calendar as CalendarIcon, CheckCircle, Scale, Users, Download, Upload, AlertTriangle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const AdminDashboard = () => {
   const [finances, setFinances] = useState([]);
@@ -35,6 +37,50 @@ const AdminDashboard = () => {
 
   const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val) || '0 đ';
 
+  const handleExport = async () => {
+    try {
+      toast.loading('Đang trích xuất dữ liệu...', { id: 'backup' });
+      const data = await exportDatabase();
+      const jsonString = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `quanlygiasu_backup_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Sao lưu dữ liệu thành công!', { id: 'backup' });
+    } catch (err) {
+      toast.error('Lỗi khi sao lưu dữ liệu', { id: 'backup' });
+    }
+  };
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!window.confirm('CẢNH BÁO NGUY HIỂM: Hành động này sẽ XÓA SẠCH toàn bộ dữ liệu hiện tại và thay thế bằng dữ liệu từ file bạn vừa tải lên! Bạn có chắc chắn muốn tiếp tục không?')) {
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const jsonData = JSON.parse(event.target.result);
+        toast.loading('Đang phục hồi dữ liệu, vui lòng không đóng trang...', { id: 'restore' });
+        await importDatabase(jsonData);
+        toast.success('Phục hồi dữ liệu thành công! Trang sẽ tải lại sau 2 giây.', { id: 'restore', duration: 3000 });
+        setTimeout(() => window.location.reload(), 2000);
+      } catch (err) {
+        toast.error('Lỗi khi phục hồi dữ liệu: ' + (err.response?.data?.message || err.message), { id: 'restore' });
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   return (
     <div className="max-w-7xl mx-auto animate-in fade-in duration-500 pb-10">
       
@@ -48,14 +94,28 @@ const AdminDashboard = () => {
               <p className="text-slate-500 text-sm mt-1">Doanh thu theo tháng của gia sư</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
-            <label className="text-sm font-semibold text-slate-700">Chọn Tháng:</label>
-            <input 
-              type="month" 
-              value={selectedMonth}
-              onChange={e => setSelectedMonth(e.target.value)}
-              className="bg-transparent outline-none font-bold text-slate-800"
-            />
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex gap-2">
+              <button 
+                onClick={handleExport}
+                className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl font-semibold border border-indigo-200 transition-colors"
+              >
+                <Download size={18} /> Backup
+              </button>
+              <label className="flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-2 rounded-xl font-semibold border border-rose-200 transition-colors cursor-pointer">
+                <Upload size={18} /> Restore
+                <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+              </label>
+            </div>
+            <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 mt-2 sm:mt-0">
+              <label className="text-sm font-semibold text-slate-700">Chọn Tháng:</label>
+              <input 
+                type="month" 
+                value={selectedMonth}
+                onChange={e => setSelectedMonth(e.target.value)}
+                className="bg-transparent outline-none font-bold text-slate-800"
+              />
+            </div>
           </div>
         </div>
 

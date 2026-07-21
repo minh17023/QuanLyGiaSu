@@ -1,0 +1,35 @@
+# ===== CHUNG THƯỜNG QUY =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== BẢO MẬT & MÔI TRƯỜNG =====
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===== BACKEND =====
+# Bỏ qua file Database (Không bao giờ đẩy DB lên GitHub)
+backend/*.sqlite
+backend/*.sqlite3
+backend/*.db
+backend/*.sqlite-journal
+backend/tutor_db.sqlite
+
+# ===== FRONTEND =====
+# Bỏ qua thư mục build của Vite/React
+frontend/dist/
+frontend/build/
+frontend/dist-ssr/
+*.local
+
+# ===== HỆ ĐIỀU HÀNH & EDITOR =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Plus, Edit, Trash2, X } from 'lucide-react';
+import toast from 'react-hot-toast';
+import ConfirmModal from '../../components/admin/ConfirmModal';
 import { getAllCourses, createCourse, updateCourse, deleteCourse } from '../../services/course.service';
 
 const AdminCourses = () => {
@@ -12,6 +14,7 @@ const AdminCourses = () => {
     price: '',
     status: 'active'
   });
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, id: null });
 
   useEffect(() => {
     fetchCourses();
@@ -31,13 +34,15 @@ const AdminCourses = () => {
     try {
       if (editingId) {
         await updateCourse(editingId, formData);
+        toast.success('Cập nhật thành công');
       } else {
         await createCourse(formData);
+        toast.success('Thêm mới thành công');
       }
       setIsModalOpen(false);
       fetchCourses();
     } catch (err) {
-      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+      toast.error('Lỗi: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -52,14 +57,18 @@ const AdminCourses = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa khóa học này?')) {
-      try {
-        await deleteCourse(id);
-        fetchCourses();
-      } catch (err) {
-        alert('Lỗi khi xóa khóa học!');
-      }
+  const openDeleteConfirm = (id) => {
+    setConfirmConfig({ isOpen: true, id });
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteCourse(confirmConfig.id);
+      toast.success('Đã xóa thành công');
+      setConfirmConfig({ isOpen: false, id: null });
+      fetchCourses();
+    } catch (err) {
+      toast.error('Lỗi khi xóa khóa học!');
     }
   };
 
@@ -122,7 +131,7 @@ const AdminCourses = () => {
                     <button onClick={() => handleEdit(course)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                       <Edit size={18} />
                     </button>
-                    <button onClick={() => handleDelete(course.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <button onClick={() => openDeleteConfirm(course.id)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -178,6 +187,13 @@ const AdminCourses = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={confirmConfig.isOpen}
+        message="Bạn có chắc chắn muốn xóa khóa học này?"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmConfig({ isOpen: false, id: null })}
+      />
     </div>
   );
 };

@@ -10,6 +10,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { getAllSchedules, createSchedule, updateSchedule, deleteSchedule } from '../../services/schedule.service';
 import { getAllClasses } from '../../services/class.service';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
+import ConfirmModal from '../../components/admin/ConfirmModal';
 
 registerLocale('vi', vi);
 
@@ -45,6 +47,7 @@ const AdminSchedules = () => {
   });
   
   const [selectedEventId, setSelectedEventId] = useState(null);
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, id: null });
 
   useEffect(() => {
     fetchData();
@@ -114,30 +117,36 @@ const AdminSchedules = () => {
     try {
       if (selectedEventId) {
         await updateSchedule(selectedEventId, formData);
+        toast.success('Cập nhật lịch thành công');
       } else {
         const payload = { ...formData };
         if (scheduleType === 'individual') {
           payload.student_ids = selectedStudentIds;
         }
         await createSchedule(payload);
+        toast.success('Tạo lịch thành công');
       }
       setIsModalOpen(false);
       fetchData();
     } catch (err) {
-      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+      toast.error('Lỗi: ' + (err.response?.data?.message || err.message));
     }
   };
 
-  const handleDelete = async () => {
+  const openDeleteConfirm = () => {
     if (!selectedEventId) return;
-    if (window.confirm('Bạn có chắc chắn muốn xóa lịch này? (Thao tác này cũng xóa luôn danh sách điểm danh của ca học)')) {
-      try {
-        await deleteSchedule(selectedEventId);
-        setIsModalOpen(false);
-        fetchData();
-      } catch (err) {
-        alert('Lỗi khi xóa!');
-      }
+    setConfirmConfig({ isOpen: true, id: selectedEventId });
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteSchedule(confirmConfig.id);
+      toast.success('Đã xóa lịch học');
+      setIsModalOpen(false);
+      setConfirmConfig({ isOpen: false, id: null });
+      fetchData();
+    } catch (err) {
+      toast.error('Lỗi khi xóa!');
     }
   };
 
@@ -307,9 +316,9 @@ const AdminSchedules = () => {
                 </select>
               </div>
               
-              <div className="pt-4 flex justify-between gap-3 sticky bottom-0 bg-white border-t border-slate-100 mt-4 p-2">
+              <div className="pt-4 flex justify-between gap-3 sticky bottom-0 bg-white border-t border-zinc-100 mt-4 p-2">
                 {selectedEventId ? (
-                  <button type="button" onClick={handleDelete} className="px-4 py-3 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors">
+                  <button type="button" onClick={openDeleteConfirm} className="px-4 py-3 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors">
                     <Trash2 size={20} />
                   </button>
                 ) : <div />}
@@ -325,6 +334,13 @@ const AdminSchedules = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={confirmConfig.isOpen}
+        message="Bạn có chắc chắn muốn xóa lịch này? (Thao tác này cũng xóa luôn danh sách điểm danh của ca học)"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmConfig({ isOpen: false, id: null })}
+      />
     </div>
   );
 };

@@ -11,10 +11,20 @@ import UserLogin from './pages/user/Login';
 import UserRegister from './pages/user/Register';
 import UserDashboard from './pages/user/UserDashboard';
 import { AuthProvider } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          borderRadius: '16px',
+          background: '#fff',
+          color: '#18181b', // zinc-900
+          fontWeight: '600',
+          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        },
+      }} />
       <Routes>
         <Route path="/" element={<Navigate to="/user/login" replace />} />
         

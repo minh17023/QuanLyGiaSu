@@ -4,6 +4,8 @@ import { getAllClasses, createClass, updateClass, deleteClass } from '../../serv
 import { getAllCourses } from '../../services/course.service';
 import { adminEnrollCourse, deleteEnrollment } from '../../services/enrollment.service';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
+import ConfirmModal from '../../components/admin/ConfirmModal';
 
 const AdminClasses = () => {
   const [classes, setClasses] = useState([]);
@@ -27,6 +29,7 @@ const AdminClasses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewClassData, setViewClassData] = useState(null);
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, type: null, payload: null, message: '' });
 
   useEffect(() => {
     fetchData();
@@ -52,13 +55,15 @@ const AdminClasses = () => {
     try {
       if (editingId) {
         await updateClass(editingId, formData);
+        toast.success('Cập nhật thành công');
       } else {
         await createClass(formData);
+        toast.success('Thêm mới thành công');
       }
       setIsModalOpen(false);
       fetchData();
     } catch (err) {
-      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+      toast.error('Lỗi: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -73,15 +78,39 @@ const AdminClasses = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa lớp học này?')) {
+  const handleDeleteClass = (id) => {
+    setConfirmConfig({
+      isOpen: true,
+      type: 'CLASS',
+      payload: id,
+      message: 'Bạn có chắc chắn muốn xóa lớp học này?'
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { type, payload } = confirmConfig;
+    if (type === 'CLASS') {
       try {
-        await deleteClass(id);
+        await deleteClass(payload);
+        toast.success('Đã xóa lớp học');
         fetchData();
       } catch (err) {
-        alert('Lỗi khi xóa lớp học!');
+        toast.error('Lỗi khi xóa lớp học!');
+      }
+    } else if (type === 'STUDENT') {
+      try {
+        await deleteEnrollment(payload);
+        toast.success('Đã xóa học sinh khỏi lớp');
+        setViewClassData(prev => ({
+          ...prev,
+          Enrollments: prev.Enrollments.filter(e => e.id !== payload)
+        }));
+        fetchData();
+      } catch (err) {
+        toast.error('Có lỗi khi xóa học sinh khỏi lớp.');
       }
     }
+    setConfirmConfig({ isOpen: false, type: null, payload: null, message: '' });
   };
 
   const openAddModal = () => {
@@ -127,29 +156,21 @@ const AdminClasses = () => {
       await Promise.all(
         newStudentIds.map(studentId => adminEnrollCourse(studentId, currentClassId))
       );
-      alert(`Đã thêm ${newStudentIds.length} học sinh vào lớp!`);
+      toast.success(`Đã thêm ${newStudentIds.length} học sinh vào lớp!`);
       setIsStudentModalOpen(false);
       fetchData();
     } catch (err) {
-      alert('Có lỗi khi thêm học sinh. Vui lòng thử lại.');
+      toast.error('Có lỗi khi thêm học sinh. Vui lòng thử lại.');
     }
   };
 
-  const handleRemoveStudent = async (enrollmentId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa học sinh này khỏi lớp?')) {
-      try {
-        await deleteEnrollment(enrollmentId);
-        // Cập nhật lại viewClassData để modal không bị đóng mà vẫn mất học sinh đó
-        setViewClassData(prev => ({
-          ...prev,
-          Enrollments: prev.Enrollments.filter(e => e.id !== enrollmentId)
-        }));
-        // Cập nhật dữ liệu nền
-        fetchData();
-      } catch (err) {
-        alert('Có lỗi khi xóa học sinh khỏi lớp.');
-      }
-    }
+  const handleRemoveStudent = (enrollmentId) => {
+    setConfirmConfig({
+      isOpen: true,
+      type: 'STUDENT',
+      payload: enrollmentId,
+      message: 'Bạn có chắc chắn muốn xóa học sinh này khỏi lớp?'
+    });
   };
 
   return (
@@ -218,7 +239,7 @@ const AdminClasses = () => {
                     <button onClick={() => handleEdit(cls)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                       <Edit size={18} />
                     </button>
-                    <button onClick={() => handleDelete(cls.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <button onClick={() => handleDeleteClass(cls.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -408,6 +429,13 @@ const AdminClasses = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={confirmConfig.isOpen}
+        message={confirmConfig.message}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setConfirmConfig({ isOpen: false, type: null, payload: null, message: '' })}
+      />
     </div>
   );
 };

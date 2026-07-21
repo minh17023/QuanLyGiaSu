@@ -4,6 +4,8 @@ import { getStudents, createStudent, updateStudent, deleteStudent } from '../../
 import { getTestScoresByStudent, createTestScore, deleteTestScore } from '../../services/testScore.service';
 import { getPaymentsByStudent, createPayment, deletePayment } from '../../services/payment.service';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
+import ConfirmModal from '../../components/admin/ConfirmModal';
 
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
@@ -21,6 +23,8 @@ const AdminStudents = () => {
   const [profileData, setProfileData] = useState({ username: '', full_name: '', phone: '', email: '', password: '' });
   const [newScore, setNewScore] = useState({ date: '', test_type: '', score: '', notes: '' });
   const [newPayment, setNewPayment] = useState({ payment_date: '', amount: '', note: '' });
+  
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, type: null, payload: null, message: '' });
 
   useEffect(() => {
     fetchStudents();
@@ -82,14 +86,15 @@ const AdminStudents = () => {
         const payload = { ...profileData };
         if (!payload.password) delete payload.password;
         await updateStudent(selectedStudent.id, payload);
-        alert('Cập nhật thành công');
+        toast.success('Cập nhật thành công');
       } else {
         await createStudent(profileData);
+        toast.success('Thêm mới thành công');
         setIsModalOpen(false);
       }
       fetchStudents();
     } catch (err) {
-      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+      toast.error('Lỗi: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -100,20 +105,19 @@ const AdminStudents = () => {
       setNewScore({ date: '', test_type: '', score: '', notes: '' });
       const scoresRes = await getTestScoresByStudent(selectedStudent.id);
       setTestScores(scoresRes);
+      toast.success('Đã thêm điểm thành công');
     } catch (err) {
-      alert('Lỗi khi thêm điểm');
+      toast.error('Lỗi khi thêm điểm');
     }
   };
 
-  const handleDeleteTestScore = async (id) => {
-    if(!window.confirm('Xóa điểm này?')) return;
-    try {
-      await deleteTestScore(id);
-      const scoresRes = await getTestScoresByStudent(selectedStudent.id);
-      setTestScores(scoresRes);
-    } catch (err) {
-      alert('Lỗi khi xóa điểm');
-    }
+  const handleDeleteTestScore = (id) => {
+    setConfirmConfig({
+      isOpen: true,
+      type: 'TEST_SCORE',
+      payload: id,
+      message: 'Xóa điểm này?'
+    });
   };
 
   const handleAddPayment = async (e) => {
@@ -123,31 +127,60 @@ const AdminStudents = () => {
       setNewPayment({ payment_date: '', amount: '', note: '' });
       const payRes = await getPaymentsByStudent(selectedStudent.id);
       setPayments(payRes);
+      toast.success('Đã thêm thanh toán thành công');
     } catch (err) {
-      alert('Lỗi khi thêm thanh toán');
+      toast.error('Lỗi khi thêm thanh toán');
     }
   };
 
-  const handleDeletePayment = async (id) => {
-    if(!window.confirm('Xóa giao dịch này?')) return;
-    try {
-      await deletePayment(id);
-      const payRes = await getPaymentsByStudent(selectedStudent.id);
-      setPayments(payRes);
-    } catch (err) {
-      alert('Lỗi khi xóa');
-    }
+  const handleDeletePayment = (id) => {
+    setConfirmConfig({
+      isOpen: true,
+      type: 'PAYMENT',
+      payload: id,
+      message: 'Xóa giao dịch này?'
+    });
   };
 
-  const handleDeleteStudent = async (id) => {
-    if (window.confirm('Xóa học sinh này và toàn bộ dữ liệu liên quan?')) {
+  const handleDeleteStudent = (id) => {
+    setConfirmConfig({
+      isOpen: true,
+      type: 'STUDENT',
+      payload: id,
+      message: 'Xóa học sinh này và toàn bộ dữ liệu liên quan?'
+    });
+  };
+
+  const executeConfirmAction = async () => {
+    const { type, payload } = confirmConfig;
+    if (type === 'TEST_SCORE') {
       try {
-        await deleteStudent(id);
-        fetchStudents();
+        await deleteTestScore(payload);
+        const scoresRes = await getTestScoresByStudent(selectedStudent.id);
+        setTestScores(scoresRes);
+        toast.success('Đã xóa điểm');
       } catch (err) {
-        alert('Lỗi khi xóa');
+        toast.error('Lỗi khi xóa điểm');
+      }
+    } else if (type === 'PAYMENT') {
+      try {
+        await deletePayment(payload);
+        const payRes = await getPaymentsByStudent(selectedStudent.id);
+        setPayments(payRes);
+        toast.success('Đã xóa giao dịch');
+      } catch (err) {
+        toast.error('Lỗi khi xóa');
+      }
+    } else if (type === 'STUDENT') {
+      try {
+        await deleteStudent(payload);
+        fetchStudents();
+        toast.success('Đã xóa học sinh');
+      } catch (err) {
+        toast.error('Lỗi khi xóa');
       }
     }
+    setConfirmConfig({ isOpen: false, type: null, payload: null, message: '' });
   };
 
   const formatMoney = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -470,6 +503,13 @@ const AdminStudents = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={confirmConfig.isOpen}
+        message={confirmConfig.message}
+        onConfirm={executeConfirmAction}
+        onCancel={() => setConfirmConfig({ isOpen: false, type: null, payload: null, message: '' })}
+      />
     </div>
   );
 };

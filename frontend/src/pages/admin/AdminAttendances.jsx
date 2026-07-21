@@ -3,6 +3,7 @@ import { getSchedulesByDate, getAttendanceForSchedule, markAttendance } from '..
 import { ClipboardCheck, Calendar, Clock, Check, X, AlertCircle } from 'lucide-react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { vi } from 'date-fns/locale';
+import toast from 'react-hot-toast';
 import 'react-datepicker/dist/react-datepicker.css';
 
 registerLocale('vi', vi);
@@ -61,8 +62,9 @@ const AdminAttendances = () => {
       ));
       
       await markAttendance(selectedSchedule.id, studentId, status);
+      toast.success('Điểm danh thành công!');
     } catch (err) {
-      alert('Lỗi điểm danh!');
+      toast.error('Lỗi điểm danh!');
       fetchAttendance(selectedSchedule.id); // revert
     }
   };

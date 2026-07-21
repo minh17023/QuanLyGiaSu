@@ -5,7 +5,8 @@ const {
   getAllEnrollments,
   updateStatus,
   adminEnroll,
-  deleteEnrollment
+  deleteEnrollment,
+  getStudentEnrollments
 } = require('../controllers/enrollmentController');
 const { protect, adminOnly } = require('../middlewares/authMiddleware');
 
@@ -20,6 +21,7 @@ router.get('/me', getMyEnrollments);
 
 // Dành cho Gia sư (Admin)
 router.get('/all', adminOnly, getAllEnrollments);
+router.get('/student/:studentId', adminOnly, getStudentEnrollments);
 router.put('/:id/status', adminOnly, updateStatus);
 router.post('/admin', adminOnly, adminEnroll);
 router.delete('/:id', adminOnly, deleteEnrollment);

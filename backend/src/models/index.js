@@ -9,6 +9,7 @@ const Schedule = require('./Schedule');
 const Attendance = require('./Attendance');
 const Payment = require('./Payment');
 const Material = require('./Material');
+const TestScore = require('./TestScore');
 
 // Mối quan hệ (Associations)
 
@@ -41,6 +42,10 @@ Payment.belongsTo(User, { foreignKey: 'student_id' });
 
 // Lược bỏ Payment với Course, sẽ tính qua Class/Course nếu cần
 
+// User - TestScore (1 Học sinh có nhiều điểm kiểm tra)
+User.hasMany(TestScore, { foreignKey: 'student_id' });
+TestScore.belongsTo(User, { foreignKey: 'student_id' });
+
 // Course - Materials (1 Khóa học có nhiều tài liệu)
 Course.hasMany(Material, { foreignKey: 'course_id' });
 Material.belongsTo(Course, { foreignKey: 'course_id' });
@@ -48,7 +53,7 @@ Material.belongsTo(Course, { foreignKey: 'course_id' });
 // Hàm đồng bộ
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ force: true }); // Tự động reset DB luôn vì đã đồng ý
+    await sequelize.sync({ alter: true }); // Không dùng force: true để tránh mất dữ liệu
     console.log('✅ Database đã được đồng bộ thành công!');
   } catch (error) {
     console.error('❌ Lỗi khi đồng bộ database:', error);
@@ -65,5 +70,6 @@ module.exports = {
   Schedule,
   Attendance,
   Payment,
-  Material
+  Material,
+  TestScore
 };

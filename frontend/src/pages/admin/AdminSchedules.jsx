@@ -33,6 +33,7 @@ const AdminSchedules = () => {
   
   const [scheduleType, setScheduleType] = useState('class'); // 'class' hoặc 'individual'
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -238,13 +239,25 @@ const AdminSchedules = () => {
               </div>
 
               {!selectedEventId && scheduleType === 'individual' && (
-                <div className="space-y-2 border border-slate-200 p-4 rounded-xl">
+                <div className="space-y-2 border border-slate-200 p-4 rounded-xl bg-slate-50/50">
                   <label className="text-sm font-semibold text-slate-700 block mb-2">Chọn học sinh tham gia ca này:</label>
-                  <div className="max-h-32 overflow-y-auto space-y-2">
-                    {students.map(s => (
-                      <label key={s.id} className="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg">
+                  <input 
+                    type="text" 
+                    placeholder="Tìm theo tên, username hoặc SĐT..."
+                    value={studentSearchTerm}
+                    onChange={(e) => setStudentSearchTerm(e.target.value)}
+                    className="w-full mb-3 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  />
+                  <div className="max-h-32 overflow-y-auto space-y-1">
+                    {students
+                      .filter(s => {
+                        const searchStr = studentSearchTerm.toLowerCase();
+                        return (s.full_name?.toLowerCase().includes(searchStr) || s.username?.toLowerCase().includes(searchStr) || s.phone?.includes(studentSearchTerm));
+                      })
+                      .map(s => (
+                      <label key={s.id} className="flex items-center gap-3 cursor-pointer p-2 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 transition-colors">
                         <input type="checkbox" checked={selectedStudentIds.includes(s.id)} onChange={() => toggleStudent(s.id)} className="w-4 h-4 text-blue-600 rounded border-slate-300" />
-                        <span className="text-sm font-medium">{s.full_name || s.username} ({s.phone || 'Không SĐT'})</span>
+                        <span className="text-sm font-medium text-slate-700">{s.full_name || s.username} <span className="text-slate-500 font-normal">({s.phone || 'Không SĐT'})</span></span>
                       </label>
                     ))}
                   </div>

@@ -32,8 +32,18 @@ const markAttendance = async (req, res) => {
   }
 };
 
+const getAttendancesByStudent = async (req, res) => {
+  try {
+    const list = await attendanceService.getAttendancesByStudent(req.params.studentId);
+    res.json(list);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
 module.exports = {
   getSchedulesByDate,
   getAttendanceForSchedule,
-  markAttendance
+  markAttendance,
+  getAttendancesByStudent
 };

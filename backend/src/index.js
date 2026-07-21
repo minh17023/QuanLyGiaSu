@@ -18,6 +18,8 @@ const scheduleRoutes = require('./routes/scheduleRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const testScoreRoutes = require('./routes/testScoreRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Basic route test
 app.get('/', (req, res) => {
@@ -32,6 +34,8 @@ app.use('/api/schedules', scheduleRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/attendances', attendanceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/test-scores', testScoreRoutes);
+app.use('/api/payments', paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 

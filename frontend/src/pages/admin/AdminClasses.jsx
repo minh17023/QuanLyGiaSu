@@ -88,7 +88,7 @@ const AdminClasses = () => {
     setEditingId(null);
     setFormData({ 
       name: '', 
-      course_id: courses.length > 0 ? courses[0].id : '', 
+      course_id: '', 
       description: '', 
       status: 'active' 
     });
@@ -249,7 +249,7 @@ const AdminClasses = () => {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Chọn Môn học gốc (Khóa học)</label>
                 <select value={formData.course_id} onChange={e => setFormData({...formData, course_id: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50" required>
-                  {courses.length === 0 && <option value="" disabled>Chưa có Môn học nào, hãy tạo Môn học trước!</option>}
+                  <option value="" disabled>-- Vui lòng chọn Khóa học --</option>
                   {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>

@@ -46,19 +46,39 @@ const markAttendance = async (schedule_id, student_id, status) => {
     where: { schedule_id, student_id }
   });
 
+  let record;
   if (existing) {
-    return await existing.update({ status });
+    record = await existing.update({ status });
   } else {
-    return await Attendance.create({
+    record = await Attendance.create({
       schedule_id,
       student_id,
       status
     });
   }
+
+  // Tự động chuyển màu (trạng thái) ca học thành completed nếu có điểm danh "có mặt"
+  if (status === 'present') {
+    await Schedule.update({ status: 'completed' }, { where: { id: schedule_id } });
+  }
+
+  return record;
+};
+
+const getAttendancesByStudent = async (student_id) => {
+  return await Attendance.findAll({
+    where: { student_id },
+    include: [{
+      model: Schedule,
+      include: [{ model: Class, include: [{ model: Course, attributes: ['name', 'price'] }] }]
+    }],
+    order: [[Schedule, 'start_time', 'DESC']]
+  });
 };
 
 module.exports = {
   getSchedulesByDate,
   getAttendanceForSchedule,
-  markAttendance
+  markAttendance,
+  getAttendancesByStudent
 };

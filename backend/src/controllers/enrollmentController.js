@@ -59,11 +59,22 @@ const deleteEnrollment = async (req, res) => {
   }
 };
 
+const getStudentEnrollments = async (req, res) => {
+  try {
+    const student_id = req.params.studentId;
+    const enrollments = await enrollmentService.getMyEnrollments(student_id);
+    res.json(enrollments);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
 module.exports = {
   enroll,
   getMyEnrollments,
   getAllEnrollments,
   updateStatus,
   adminEnroll,
-  deleteEnrollment
+  deleteEnrollment,
+  getStudentEnrollments
 };

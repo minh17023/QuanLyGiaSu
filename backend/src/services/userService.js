@@ -73,11 +73,18 @@ const createStudent = async (data) => {
   const userExists = await User.findOne({ where: { username } });
   if (userExists) throw new Error('Tên đăng nhập đã tồn tại!');
 
+  if (email) {
+    const emailExists = await User.findOne({ where: { email } });
+    if (emailExists) throw new Error('Email này đã được sử dụng!');
+  }
+
   const salt = await bcrypt.genSalt(10);
   const password_hash = await bcrypt.hash(password || '123456', salt); // Pass mặc định nếu không nhập
 
+  const userEmail = email && email.trim() !== '' ? email : null;
+
   const user = await User.create({
-    username, password_hash, full_name, email, phone, role: 'student'
+    username, password_hash, full_name, email: userEmail, phone, role: 'student'
   });
   return user;
 };
@@ -90,6 +97,11 @@ const updateStudent = async (id, data) => {
     const salt = await bcrypt.genSalt(10);
     data.password_hash = await bcrypt.hash(data.password, salt);
   }
+  
+  if (data.email !== undefined) {
+    data.email = data.email && data.email.trim() !== '' ? data.email : null;
+  }
+  
   return await user.update(data);
 };
 

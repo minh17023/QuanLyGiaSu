@@ -10,7 +10,7 @@ export const getAttendanceForSchedule = async (scheduleId) => {
   return response.data;
 };
 
-export const markAttendance = async (schedule_id, student_id, status) => {
-  const response = await api.post('/attendances/mark', { schedule_id, student_id, status });
+export const markAttendance = async (schedule_id, student_id, status, lesson_content, comments) => {
+  const response = await api.post('/attendances/mark', { schedule_id, student_id, status, lesson_content, comments });
   return response.data;
 };

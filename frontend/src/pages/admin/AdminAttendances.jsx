@@ -16,6 +16,16 @@ const AdminAttendances = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({
+    studentId: null,
+    studentName: '',
+    status: '',
+    lessonContent: '',
+    comments: ''
+  });
+
   useEffect(() => {
     fetchSchedules(selectedDate);
   }, [selectedDate]);
@@ -55,15 +65,34 @@ const AdminAttendances = () => {
     }
   };
 
-  const handleMark = async (studentId, status) => {
+  const handleMarkClick = (student, status) => {
+    setModalData({
+      studentId: student.student_id,
+      studentName: student.full_name,
+      status: status,
+      lessonContent: student.lesson_content || '',
+      comments: student.comments || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const confirmMarkAttendance = async () => {
+    if (modalData.status === 'present' && !modalData.lessonContent.trim()) {
+      toast.error('Vui lòng nhập nội dung buổi học!');
+      return;
+    }
+
     try {
       // Optimistic UI update
       setAttendanceList(prev => prev.map(item => 
-        item.student_id === studentId ? { ...item, attendance_status: status } : item
+        item.student_id === modalData.studentId 
+          ? { ...item, attendance_status: modalData.status, lesson_content: modalData.lessonContent, comments: modalData.comments } 
+          : item
       ));
       
-      await markAttendance(selectedSchedule.id, studentId, status);
+      await markAttendance(selectedSchedule.id, modalData.studentId, modalData.status, modalData.lessonContent, modalData.comments);
       toast.success('Điểm danh thành công!');
+      setIsModalOpen(false);
     } catch (err) {
       toast.error('Lỗi điểm danh!');
       fetchAttendance(selectedSchedule.id); // revert
@@ -183,7 +212,7 @@ const AdminAttendances = () => {
                     <td className="py-4 px-6">
                       <div className="flex justify-center gap-2">
                         <button 
-                          onClick={() => handleMark(item.student_id, 'present')}
+                          onClick={() => handleMarkClick(item, 'present')}
                           className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl border transition-all ${
                             item.attendance_status === 'present' 
                               ? 'bg-green-100 border-green-500 text-green-700 shadow-sm' 
@@ -195,7 +224,7 @@ const AdminAttendances = () => {
                         </button>
                         
                         <button 
-                          onClick={() => handleMark(item.student_id, 'absent')}
+                          onClick={() => handleMarkClick(item, 'absent')}
                           className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl border transition-all ${
                             item.attendance_status === 'absent' 
                               ? 'bg-red-100 border-red-500 text-red-700 shadow-sm' 
@@ -207,7 +236,7 @@ const AdminAttendances = () => {
                         </button>
 
                         <button 
-                          onClick={() => handleMark(item.student_id, 'excused')}
+                          onClick={() => handleMarkClick(item, 'excused')}
                           className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl border transition-all ${
                             item.attendance_status === 'excused' 
                               ? 'bg-yellow-100 border-yellow-500 text-yellow-700 shadow-sm' 
@@ -226,6 +255,94 @@ const AdminAttendances = () => {
           </div>
         )}
       </div>
+
+      {/* Modal Điểm danh */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <ClipboardCheck className="text-blue-600" size={20} />
+                Điểm Danh & Nhập Nội Dung Buổi Học
+              </h3>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-4 sm:p-6 space-y-4">
+              <div className="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-semibold w-24">Học sinh:</span>
+                  <span className="font-bold text-slate-800">{modalData.studentName}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-semibold w-24">Thời gian:</span>
+                  <span className="font-bold text-slate-800">
+                    {selectedSchedule ? `${selectedSchedule.start_time.split('T')[0]} lúc ${formatTime(selectedSchedule.start_time)}` : ''}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-semibold w-24">Trạng thái:</span>
+                  <span className={`font-bold ${
+                    modalData.status === 'present' ? 'text-green-600' :
+                    modalData.status === 'absent' ? 'text-red-600' :
+                    'text-yellow-600'
+                  }`}>
+                    {modalData.status === 'present' ? 'Có mặt (+1 buổi)' :
+                     modalData.status === 'absent' ? 'Vắng mặt' : 'Có phép'}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">
+                  Nội Dung Buổi Học / Chủ Đề {modalData.status === 'present' && <span className="text-red-500">*</span>}
+                </label>
+                <input 
+                  type="text" 
+                  value={modalData.lessonContent}
+                  onChange={(e) => setModalData({...modalData, lessonContent: e.target.value})}
+                  placeholder="Ví dụ: Unit 5 - Reading comprehension..."
+                  className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">
+                  Nhận Xét / Bài Tập Về Nhà
+                </label>
+                <textarea 
+                  value={modalData.comments}
+                  onChange={(e) => setModalData({...modalData, comments: e.target.value})}
+                  placeholder="Hoàn thành bài tập trang 20..."
+                  rows="3"
+                  className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-slate-100 bg-slate-50">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 rounded-xl font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={confirmMarkAttendance}
+                className="px-6 py-2 rounded-xl font-bold text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
+              >
+                Xác Nhận Điểm Danh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

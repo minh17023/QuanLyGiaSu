@@ -410,15 +410,19 @@ const AdminStudents = () => {
                       <tr className="border-b border-slate-200 text-sm text-slate-500">
                         <th className="pb-3 px-4 font-medium">Ngày học</th>
                         <th className="pb-3 px-4 font-medium">Lớp học</th>
+                        <th className="pb-3 px-4 font-medium">Nội dung học</th>
+                        <th className="pb-3 px-4 font-medium">Nhận xét</th>
                         <th className="pb-3 px-4 font-medium">Trạng thái</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {attendances.length === 0 ? <tr><td colSpan="3" className="py-6 text-center text-slate-500">Chưa có dữ liệu</td></tr> : 
+                      {attendances.length === 0 ? <tr><td colSpan="5" className="py-6 text-center text-slate-500">Chưa có dữ liệu</td></tr> : 
                         attendances.map(a => (
                           <tr key={a.id} className="border-b border-slate-100 text-sm hover:bg-slate-50">
                             <td className="py-4 px-4 font-medium">{new Date(a.Schedule?.start_time).toLocaleDateString('vi-VN')}</td>
                             <td className="py-4 px-4">{a.Schedule?.Class?.Course?.name}</td>
+                            <td className="py-4 px-4 text-slate-600 max-w-[200px] truncate" title={a.lesson_content}>{a.lesson_content || '-'}</td>
+                            <td className="py-4 px-4 text-slate-600 max-w-[200px] truncate" title={a.comments}>{a.comments || '-'}</td>
                             <td className="py-4 px-4">
                               {a.status === 'present' ? <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">Có mặt</span> :
                                a.status === 'absent' ? <span className="text-red-600 font-bold bg-red-50 px-2 py-1 rounded">Vắng mặt</span> :

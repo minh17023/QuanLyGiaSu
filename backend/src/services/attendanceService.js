@@ -34,26 +34,34 @@ const getAttendanceForSchedule = async (schedule_id) => {
       full_name: student.full_name || student.username,
       phone: student.phone,
       attendance_status: record.status, // 'scheduled', 'present', 'absent', 'excused'
-      attendance_id: record.id
+      attendance_id: record.id,
+      lesson_content: record.lesson_content || '',
+      comments: record.comments || ''
     };
   });
 
   return attendanceList;
 };
 
-const markAttendance = async (schedule_id, student_id, status) => {
+const markAttendance = async (schedule_id, student_id, status, lesson_content = null, comments = null) => {
   const existing = await Attendance.findOne({
     where: { schedule_id, student_id }
   });
 
   let record;
   if (existing) {
-    record = await existing.update({ status });
+    record = await existing.update({ 
+      status, 
+      lesson_content: lesson_content !== null ? lesson_content : existing.lesson_content,
+      comments: comments !== null ? comments : existing.comments
+    });
   } else {
     record = await Attendance.create({
       schedule_id,
       student_id,
-      status
+      status,
+      lesson_content,
+      comments
     });
   }
 

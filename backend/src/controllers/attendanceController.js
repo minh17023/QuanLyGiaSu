@@ -24,8 +24,8 @@ const getAttendanceForSchedule = async (req, res) => {
 
 const markAttendance = async (req, res) => {
   try {
-    const { schedule_id, student_id, status } = req.body;
-    const record = await attendanceService.markAttendance(schedule_id, student_id, status);
+    const { schedule_id, student_id, status, lesson_content, comments } = req.body;
+    const record = await attendanceService.markAttendance(schedule_id, student_id, status, lesson_content, comments);
     res.json({ message: 'Điểm danh thành công', record });
   } catch (error) {
     res.status(400).json({ message: error.message });

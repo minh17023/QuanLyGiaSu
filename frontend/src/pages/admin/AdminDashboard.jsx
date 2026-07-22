@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { getStudentFinances } from '../../services/dashboard.service';
 import { exportDatabase, importDatabase } from '../../services/backup.service';
-import { Wallet, DollarSign, Calendar as CalendarIcon, CheckCircle, Scale, Users, Download, Upload, AlertTriangle } from 'lucide-react';
+import { Wallet, DollarSign, Calendar as CalendarIcon, CheckCircle, Scale, Users, Download, Upload, AlertTriangle, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const AdminDashboard = () => {
   const [finances, setFinances] = useState([]);
   const [summary, setSummary] = useState({ totalDebt: 0, totalPaid: 0, remainingDebt: 0 });
   
-  // Set default month to current month
+  // Set default to current month's start and end date
   const today = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`);
+  const firstDayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const lastDayStr = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+  
+  const [startDate, setStartDate] = useState(firstDayStr);
+  const [endDate, setEndDate] = useState(lastDayStr);
+  const [searchStudentQuery, setSearchStudentQuery] = useState('');
 
   useEffect(() => {
-    fetchFinances(selectedMonth);
-  }, [selectedMonth]);
+    fetchFinances(startDate, endDate);
+  }, [startDate, endDate]);
 
-  const fetchFinances = async (monthStr) => {
+  const fetchFinances = async (startDateStr, endDateStr) => {
     try {
-      if (!monthStr) return;
-      const [year, month] = monthStr.split('-');
-      const data = await getStudentFinances(month, year);
+      if (!startDateStr || !endDateStr) return;
+      
+      // Validations: If end date is before start date, we could skip fetching or handle it
+      if (startDateStr > endDateStr) {
+        setFinances([]);
+        setSummary({ totalDebt: 0, totalPaid: 0, remainingDebt: 0 });
+        return;
+      }
+
+      const data = await getStudentFinances(startDateStr, endDateStr);
       setFinances(data);
       
       let tDebt = 0, tPaid = 0, rDebt = 0;
@@ -107,14 +120,26 @@ const AdminDashboard = () => {
                 <input type="file" accept=".json" onChange={handleImport} className="hidden" />
               </label>
             </div>
-            <div className="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-xl border border-slate-200/50 mt-2 sm:mt-0">
-              <label className="text-sm font-semibold text-slate-700">Chọn Tháng:</label>
-              <input 
-                type="month" 
-                value={selectedMonth}
-                onChange={e => setSelectedMonth(e.target.value)}
-                className="bg-transparent outline-none font-bold text-slate-800"
-              />
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 bg-white/50 p-3 sm:px-4 sm:py-2 rounded-xl border border-slate-200/50 mt-2 sm:mt-0 w-full sm:w-auto">
+              <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Từ:</label>
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="bg-transparent outline-none font-bold text-slate-800"
+                />
+              </div>
+              <span className="hidden sm:inline text-slate-400">|</span>
+              <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Đến:</label>
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="bg-transparent outline-none font-bold text-slate-800"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -125,7 +150,7 @@ const AdminDashboard = () => {
             <div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Tổng Học Sinh</p>
               <p className="text-2xl font-black text-indigo-600">{finances.length}</p>
-              <p className="text-xs text-slate-400 mt-1">Trong tháng này</p>
+              <p className="text-xs text-slate-400 mt-1">Trong khoảng thời gian chọn</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
               <Users size={24} />
@@ -146,7 +171,7 @@ const AdminDashboard = () => {
           {/* Card 2: Đã thu tiền */}
           <div className="p-6 rounded-2xl border border-slate-200/50 shadow-sm flex items-center justify-between bg-white/40 backdrop-blur-lg">
             <div>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Đã Thu Tiền (Trong tháng)</p>
+              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Đã Thu Tiền (Trong kỳ)</p>
               <p className="text-2xl font-black text-blue-600">{formatCurrency(summary.totalPaid)}</p>
               <p className="text-xs text-slate-400 mt-1">Tiền mặt / Chuyển khoản</p>
             </div>
@@ -158,7 +183,7 @@ const AdminDashboard = () => {
           {/* Card 3: Còn nợ */}
           <div className="p-6 rounded-2xl border border-slate-200/50 shadow-sm flex items-center justify-between bg-white/40 backdrop-blur-lg">
             <div>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Còn Nợ (Tháng chọn)</p>
+              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Còn Nợ (Kỳ chọn)</p>
               <p className="text-2xl font-black text-orange-500">{formatCurrency(summary.remainingDebt)}</p>
               <p className="text-xs text-slate-400 mt-1">Chưa thanh toán hết</p>
             </div>
@@ -169,77 +194,108 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white/40 backdrop-blur-lg rounded-3xl shadow-sm border border-slate-200/50 overflow-x-auto p-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h2 className="text-lg font-bold text-slate-800">Chi Tiết Thu Nhập Từng Học Sinh Trong Tháng</h2>
-          {selectedMonth && (
-            <div className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full font-bold text-sm border border-emerald-100">
-              Tháng {selectedMonth.split('-')[1]}/{selectedMonth.split('-')[0]}
+      {(() => {
+        const filteredFinances = finances.filter(student => 
+          student.full_name?.toLowerCase().includes(searchStudentQuery.toLowerCase()) || 
+          student.phone?.includes(searchStudentQuery)
+        );
+
+        return (
+          <div className="bg-white/40 backdrop-blur-lg rounded-3xl shadow-sm border border-slate-200/50 overflow-x-auto p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-bold text-slate-800">Chi Tiết Thu Nhập Từng Học Sinh</h2>
+                {startDate && endDate && (
+                  <div className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full font-bold text-sm border border-emerald-100 hidden sm:block">
+                    {startDate === endDate 
+                      ? `Ngày ${startDate.split('-')[2]}/${startDate.split('-')[1]}/${startDate.split('-')[0]}`
+                      : `Từ ${startDate.split('-')[2]}/${startDate.split('-')[1]}/${startDate.split('-')[0]} đến ${endDate.split('-')[2]}/${endDate.split('-')[1]}/${endDate.split('-')[0]}`
+                    }
+                  </div>
+                )}
+              </div>
+              
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Tìm học sinh, SĐT..." 
+                  value={searchStudentQuery}
+                  onChange={e => setSearchStudentQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-white/50 border border-slate-200/50 rounded-xl outline-none focus:border-blue-500/50 text-sm"
+                />
+              </div>
             </div>
-          )}
-        </div>
-        
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-slate-200 text-slate-500 text-xs font-bold uppercase">
-              <th className="py-3 px-2">Họ và tên</th>
-              <th className="py-3 px-2">Lớp</th>
-              <th className="py-3 px-2">Học phí / Buổi</th>
-              <th className="py-3 px-2">Buổi "Có mặt"</th>
-              <th className="py-3 px-2">Tổng tiền tháng</th>
-              <th className="py-3 px-2">Đã đóng</th>
-              <th className="py-3 px-2">Còn nợ tháng</th>
-            </tr>
-          </thead>
-          <tbody>
-            {finances.length === 0 ? (
-              <tr><td colSpan="7" className="text-center py-10 text-slate-600 font-medium">Chưa có dữ liệu thu nhập trong tháng này</td></tr>
-            ) : finances.map(student => (
-              <tr key={student.student_id} className="border-b border-slate-200/50 last:border-0 hover:bg-white/50 transition-colors">
-                <td className="py-4 px-2">
-                  <p className="font-bold text-slate-800">{student.full_name}</p>
-                </td>
-                <td className="py-4 px-2">
-                  <div className="space-y-1">
-                    {student.details && student.details.length > 0 ? student.details.map((d, i) => (
-                      <div key={i} className="text-sm font-semibold text-slate-600 bg-slate-100 inline-block px-2 py-0.5 rounded mr-1">
-                        {d.class_name}
+            
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-500 text-xs font-bold uppercase">
+                  <th className="py-3 px-2">Họ và tên</th>
+                  <th className="py-3 px-2">Lớp</th>
+                  <th className="py-3 px-2">Học phí / Buổi</th>
+                  <th className="py-3 px-2">Buổi "Có mặt"</th>
+                  <th className="py-3 px-2">Tổng tiền</th>
+                  <th className="py-3 px-2">Đã đóng</th>
+                  <th className="py-3 px-2">Còn nợ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredFinances.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-10 text-slate-600 font-medium">
+                      {finances.length === 0 
+                        ? `Chưa có dữ liệu thu nhập trong khoảng thời gian này ${startDate > endDate ? '(Lưu ý: "Từ ngày" lớn hơn "Đến ngày")' : ''}` 
+                        : 'Không tìm thấy học sinh phù hợp'}
+                    </td>
+                  </tr>
+                ) : filteredFinances.map(student => (
+                  <tr key={student.student_id} className="border-b border-slate-200/50 last:border-0 hover:bg-white/50 transition-colors">
+                    <td className="py-4 px-2">
+                      <p className="font-bold text-slate-800">{student.full_name}</p>
+                    </td>
+                    <td className="py-4 px-2">
+                      <div className="space-y-1">
+                        {student.details && student.details.length > 0 ? student.details.map((d, i) => (
+                          <div key={i} className="text-sm font-semibold text-slate-600 bg-slate-100 inline-block px-2 py-0.5 rounded mr-1">
+                            {d.class_name}
+                          </div>
+                        )) : <span className="text-sm text-slate-400">-</span>}
                       </div>
-                    )) : <span className="text-sm text-slate-400">-</span>}
-                  </div>
-                </td>
-                <td className="py-4 px-2">
-                  <div className="space-y-1">
-                    {student.details && student.details.length > 0 ? student.details.map((d, i) => (
-                      <div key={i} className="text-sm text-slate-600">{formatCurrency(d.price)}</div>
-                    )) : <span className="text-sm text-slate-400">-</span>}
-                  </div>
-                </td>
-                <td className="py-4 px-2">
-                  <div className="space-y-1">
-                    {student.details && student.details.length > 0 ? student.details.map((d, i) => (
-                      <div key={i} className="text-sm font-bold text-blue-600">{d.attended_sessions} buổi</div>
-                    )) : <span className="text-sm text-slate-400">-</span>}
-                  </div>
-                </td>
-                <td className="py-4 px-2">
-                  <p className="font-bold text-emerald-600">{formatCurrency(student.total_debt)}</p>
-                </td>
-                <td className="py-4 px-2">
-                  <p className="font-bold text-emerald-600">{student.total_paid > 0 ? formatCurrency(student.total_paid) : '0 đ'}</p>
-                </td>
-                <td className="py-4 px-2">
-                  {student.remaining_debt > 0 ? (
-                    <p className="font-bold text-orange-500">{formatCurrency(student.remaining_debt)}</p>
-                  ) : (
-                    <p className="font-bold text-emerald-600 flex items-center gap-1"><CheckCircle size={14}/> 0 VNĐ</p>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                    <td className="py-4 px-2">
+                      <div className="space-y-1">
+                        {student.details && student.details.length > 0 ? student.details.map((d, i) => (
+                          <div key={i} className="text-sm text-slate-600">{formatCurrency(d.price)}</div>
+                        )) : <span className="text-sm text-slate-400">-</span>}
+                      </div>
+                    </td>
+                    <td className="py-4 px-2">
+                      <div className="space-y-1">
+                        {student.details && student.details.length > 0 ? student.details.map((d, i) => (
+                          <div key={i} className="text-sm font-bold text-blue-600">{d.attended_sessions} buổi</div>
+                        )) : <span className="text-sm text-slate-400">-</span>}
+                      </div>
+                    </td>
+                    <td className="py-4 px-2">
+                      <p className="font-bold text-emerald-600">{formatCurrency(student.total_debt)}</p>
+                    </td>
+                    <td className="py-4 px-2">
+                      <p className="font-bold text-emerald-600">{student.total_paid > 0 ? formatCurrency(student.total_paid) : '0 đ'}</p>
+                    </td>
+                    <td className="py-4 px-2">
+                      {student.remaining_debt > 0 ? (
+                        <p className="font-bold text-orange-500">{formatCurrency(student.remaining_debt)}</p>
+                      ) : (
+                        <p className="font-bold text-emerald-600 flex items-center gap-1"><CheckCircle size={14}/> 0 VNĐ</p>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
     </div>
   );
 };

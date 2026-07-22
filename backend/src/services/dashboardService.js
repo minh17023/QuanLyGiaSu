@@ -1,11 +1,25 @@
 const { User, Attendance, Schedule, Class, Course, Payment } = require('../models');
 const { Op } = require('sequelize');
 
-const getStudentFinances = async ({ month, year } = {}) => {
+const getStudentFinances = async ({ month, year, startMonth, startYear, endMonth, endYear, startDateStr, endDateStr } = {}) => {
   let scheduleWhere = {};
   let paymentWhere = { status: 'paid' };
 
-  if (month && year) {
+  if (startDateStr && endDateStr) {
+    const startDate = new Date(startDateStr);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(endDateStr);
+    endDate.setHours(23, 59, 59, 999);
+
+    scheduleWhere.start_time = {
+      [Op.between]: [startDate, endDate]
+    };
+
+    paymentWhere.payment_date = {
+      [Op.between]: [startDate, endDate]
+    };
+  } else if (startMonth && startYear && endMonth && endYear) {
+    // Fallback for single month backward compatibility
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
 

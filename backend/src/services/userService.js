@@ -2,6 +2,18 @@ const { User, TestScore } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const validateEmail = (email) => {
+  if (!email || email.trim() === '') return true;
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
+
+const validatePhone = (phone) => {
+  if (!phone || phone.trim() === '') return true;
+  const re = /^0\d{9}$/;
+  return re.test(phone);
+};
+
 const registerUser = async (userData) => {
   const { username, password, full_name, email, phone, role } = userData;
   
@@ -9,6 +21,9 @@ const registerUser = async (userData) => {
   if (userExists) {
     throw new Error('Tên đăng nhập đã tồn tại!');
   }
+
+  if (email && !validateEmail(email)) throw new Error('Định dạng email không hợp lệ!');
+  if (phone && !validatePhone(phone)) throw new Error('Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0!');
 
   const salt = await bcrypt.genSalt(10);
   const password_hash = await bcrypt.hash(password, salt);
@@ -81,6 +96,9 @@ const createStudent = async (data) => {
   const userExists = await User.findOne({ where: { username } });
   if (userExists) throw new Error('Tên đăng nhập đã tồn tại!');
 
+  if (email && !validateEmail(email)) throw new Error('Định dạng email không hợp lệ!');
+  if (phone && !validatePhone(phone)) throw new Error('Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0!');
+
   if (email) {
     const emailExists = await User.findOne({ where: { email } });
     if (emailExists) throw new Error('Email này đã được sử dụng!');
@@ -107,7 +125,12 @@ const updateStudent = async (id, data) => {
   }
   
   if (data.email !== undefined) {
+    if (data.email && !validateEmail(data.email)) throw new Error('Định dạng email không hợp lệ!');
     data.email = data.email && data.email.trim() !== '' ? data.email : null;
+  }
+  
+  if (data.phone !== undefined) {
+    if (data.phone && !validatePhone(data.phone)) throw new Error('Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0!');
   }
   
   return await user.update(data);

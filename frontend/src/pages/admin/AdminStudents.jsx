@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Edit, Trash2, X, User as UserIcon, BookOpen, FileText, CreditCard, Check, Trash } from 'lucide-react';
+import { Users, Plus, Edit, Trash2, X, User as UserIcon, BookOpen, FileText, CreditCard, Check, Trash, Eye, EyeOff } from 'lucide-react';
 import { getStudents, createStudent, updateStudent, deleteStudent } from '../../services/student.service';
 import { getTestScoresByStudent, createTestScore, deleteTestScore } from '../../services/testScore.service';
 import { getPaymentsByStudent, createPayment, deletePayment } from '../../services/payment.service';
@@ -24,6 +24,7 @@ const AdminStudents = () => {
   const [profileData, setProfileData] = useState({ username: '', full_name: '', phone: '', email: '', password: '' });
   const [newScore, setNewScore] = useState({ date: '', test_type: '', score: '', notes: '' });
   const [newPayment, setNewPayment] = useState({ payment_date: '', amount: '', note: '' });
+  const [showPassword, setShowPassword] = useState(false);
   
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, type: null, payload: null, message: '' });
 
@@ -331,17 +332,44 @@ const AdminStudents = () => {
                       {!selectedStudent && (
                         <div>
                           <label className="text-sm font-semibold text-slate-700 block mb-1">Mật khẩu</label>
-                          <input type="text" value={profileData.password} onChange={e => setProfileData({...profileData, password: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" placeholder="Khởi tạo mật khẩu" />
+                          <div className="relative">
+                            <input 
+                              type={showPassword ? "text" : "password"} 
+                              value={profileData.password} 
+                              onChange={e => setProfileData({...profileData, password: e.target.value})} 
+                              className="w-full border border-slate-200 rounded-xl px-4 py-2 pr-10 outline-none focus:border-blue-500" 
+                              placeholder="Khởi tạo mật khẩu" 
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                            >
+                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
                         </div>
                       )}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-semibold text-slate-700 block mb-1">SĐT Phụ huynh</label>
-                          <input type="text" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" />
+                          <input 
+                            type="tel" 
+                            pattern="0[0-9]{9}" 
+                            title="Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0" 
+                            value={profileData.phone} 
+                            onChange={e => setProfileData({...profileData, phone: e.target.value.replace(/[^0-9]/g, '').slice(0, 10)})} 
+                            className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" 
+                          />
                         </div>
                         <div>
                           <label className="text-sm font-semibold text-slate-700 block mb-1">Email</label>
-                          <input type="email" value={profileData.email} onChange={e => setProfileData({...profileData, email: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" />
+                          <input 
+                            type="email" 
+                            value={profileData.email} 
+                            onChange={e => setProfileData({...profileData, email: e.target.value})} 
+                            className="w-full border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500" 
+                          />
                         </div>
                       </div>
                       <button type="submit" className="w-full py-3 mt-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">Lưu Thông Tin</button>

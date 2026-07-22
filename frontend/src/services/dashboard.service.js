@@ -1,10 +1,10 @@
 import api from './api';
 
-export const getStudentFinances = async (month, year) => {
+export const getStudentFinances = async (startDateStr, endDateStr) => {
   const params = {};
-  if (month && year) {
-    params.month = month;
-    params.year = year;
+  if (startDateStr && endDateStr) {
+    params.startDateStr = startDateStr;
+    params.endDateStr = endDateStr;
   }
   const response = await api.get('/dashboard/finances', { params });
   return response.data;
